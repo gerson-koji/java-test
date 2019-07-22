@@ -1,0 +1,53 @@
+package beginners;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.StringJoiner;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ExtremelyBasicTest {
+
+    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+
+    @BeforeEach
+    public void setUpStreams() {
+        System.setOut(new PrintStream(outContent));
+    }
+
+    @AfterEach
+    public void restoreStreams() {
+        System.setOut(originalOut);
+    }
+
+
+    @DisplayName("Calculate the sum of ")
+    @ParameterizedTest(name = "{0} and {1} must return {2}")
+    @CsvSource({
+            "10, 9, 19",
+            "-10, 4, -6",
+            "15, -7, 8",
+            "0, 0, 0"
+    })
+    public void shouldCalculateSum(final String valueA, final String valueB, final String expectedResult) {
+        try {
+            final String inputValues = new StringJoiner("\n").add(valueA).add(valueB).toString();
+            System.setIn(new ByteArrayInputStream(inputValues.getBytes()));
+
+            ExtremelyBasic.main(new String[]{});
+
+            assertEquals("X = " + expectedResult + "\n", outContent.toString());
+        } finally {
+            System.setIn(System.in);
+        }
+    }
+}
